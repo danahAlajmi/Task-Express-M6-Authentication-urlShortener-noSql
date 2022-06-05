@@ -2,7 +2,7 @@ const LocalStrategy = require("passport-local").Strategy;
 const bcrypt = require("bcrypt");
 const User = require("../models/User");
 const JWTStrategy = require("passport-jwt").Strategy;
-const JWT_SECRET = require("../secret/keys");
+const { JWT_SECRET, JWT_EXP } = require("../secret/keys");
 const { fromAuthHeaderAsBearerToken } = require("passport-jwt").ExtractJwt;
 
 exports.localStrategy = new LocalStrategy(async (username, password, done) => {
@@ -21,7 +21,10 @@ exports.localStrategy = new LocalStrategy(async (username, password, done) => {
 });
 
 exports.jwtStrategy = new JWTStrategy(
-  { jwtFromRequest: fromAuthHeaderAsBearerToken(), secretOrKey: JWT_SECRET },
+  {
+    jwtFromRequest: fromAuthHeaderAsBearerToken(),
+    secretOrKey: JWT_SECRET,
+  },
   async (jwtPayload, done) => {
     if (Date.now() > jwtPayload.exp) {
       return done(null, false);
